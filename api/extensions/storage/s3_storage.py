@@ -16,6 +16,8 @@ class S3Storage(BaseStorage):
         super().__init__(app)
         app_config = self.app.config
         self.bucket_name = app_config.get('S3_BUCKET_NAME')
+        verify_ssl = app_config.get('S3_VERIFY_SSL', False)
+
         if app_config.get('S3_USE_AWS_MANAGED_IAM'):
             session = boto3.Session()
             self.client = session.client('s3')
@@ -26,7 +28,8 @@ class S3Storage(BaseStorage):
                         aws_access_key_id=app_config.get('S3_ACCESS_KEY'),
                         endpoint_url=app_config.get('S3_ENDPOINT'),
                         region_name=app_config.get('S3_REGION'),
-                        config=Config(s3={'addressing_style': app_config.get('S3_ADDRESS_STYLE')})
+                        config=Config(s3={'addressing_style': app_config.get('S3_ADDRESS_STYLE')}),
+                        verify=verify_ssl
                     )
 
     def save(self, filename, data):
